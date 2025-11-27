@@ -1,0 +1,12 @@
+services:
+  php:
+    container_name: sc-php
+    build:
+      context: ./docker/php
+      args:
+        - GROUP_ID=${DOCKER_GROUP_ID}
+        - USER_ID=${DOCKER_USER_ID}
+    volumes:
+      - ./:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
