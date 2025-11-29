@@ -8,4 +8,4 @@ composer:
 	@"$(PHP_CLI)"frankenphp php-cli /usr/local/bin/composer ${c}
 
 ext-init:
-	GEN_STUB_SCRIPT=/usr/local/sconcur/php-src/build/gen_stub.php frankenphp extension-init /app/ext/adapter/adapter.go
+	GEN_STUB_SCRIPT=/usr/local/sconcur/php-src/build/gen_stub.php frankenphp extension-init /app/ext/build/extension/sconcur.go
