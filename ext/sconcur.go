@@ -1,20 +1,20 @@
-//go:build franken
-// +build franken
+package sconcur
 
-//export_php:namespace SConcur\Extension
-package extension
-
-// #include <Zend/zend_types.h>
+// #include <stdlib.h>
+// #include "sconcur.h"
 import "C"
-
 import (
-	"sconcur/internal/services/ping_service"
 	"unsafe"
 
 	"github.com/dunglas/frankenphp"
+	"github.com/sprust/sconcur-franken/internal/services/ping_service"
 )
 
-//export_php:function ping(string $string): string
+func init() {
+	frankenphp.RegisterExtension(unsafe.Pointer(&C.sconcur_module_entry))
+}
+
+//export ping
 func ping(s *C.zend_string) unsafe.Pointer {
 	str := frankenphp.GoString(unsafe.Pointer(s))
 
