@@ -1,4 +1,4 @@
-module sconcur
+module github.com/sprust/sconcur-franken
 
 go 1.25.0
 
