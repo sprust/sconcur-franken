@@ -2,9 +2,6 @@ FROM ubuntu:24.04
 
 WORKDIR /app
 
-ENV COMPOSER_ALLOW_SUPERUSER=1
-ENV COMPOSER_PHP="frankenphp php-cli"
-
 # Container user & group
 ARG USER_ID
 ARG GROUP_ID
