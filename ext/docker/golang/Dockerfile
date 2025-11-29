@@ -12,8 +12,15 @@ RUN apt-get update && \
     ca-certificates \
     curl \
     build-essential \
-    php-dev \
     pkg-config \
+    libxml2-dev \
+    libsqlite3-dev \
+    php-dev \
+    php-cli \
+    php-pear \
+    make \
+    cmake \
+    git \
     wget && \
     rm -rf /var/lib/apt/lists/*
 
@@ -37,8 +44,37 @@ RUN wget https://github.com/caddyserver/xcaddy/releases/download/v0.4.5/xcaddy_0
     dpkg -i xcaddy_0.4.5_linux_amd64.deb && \
     rm xcaddy_0.4.5_linux_amd64.deb
 
-RUN apt-get install -y build-essential php-dev pkg-config
+# PHP source
+RUN rm -rf /usr/local/sconcur
+RUN mkdir -p -m 777 /usr/local/sconcur
+WORKDIR /usr/local/sconcur
 
+RUN rm -rf php-src && \
+  mkdir -p php-src && \
+  wget -P /tmp https://www.php.net/distributions/php-8.4.15.tar.gz && \
+  tar -xf /tmp/php-8.4.15.tar.gz -C php-src --strip-components=1 && \
+  rm /tmp/php-8.4.15.tar.gz && \
+  chmod -R 777 php-src && \
+  cd php-src && \
+  ./configure \
+    --enable-embed \
+    --enable-zts \
+    --disable-zend-signals \
+    --enable-zend-max-execution-timers && \
+  make -j"$(getconf _NPROCESSORS_ONLN)" && \
+  make install
+
+# watcher
+RUN rm -rf watcher && \
+  git clone https://github.com/e-dant/watcher.git && \
+  cd watcher && \
+  cmake -B build && \
+  cmake --build build && \
+  cmake --install build && \
+  echo "/usr/local/lib" | tee /etc/ld.so.conf.d/watcher.conf && \
+  ldconfig
+
+WORKDIR /app
 
 # Check if user and group doesn't exist before creating
 RUN getent group "$GROUP_ID" || addgroup --gid "$GROUP_ID" user

@@ -14,6 +14,7 @@ func init() {
 	frankenphp.RegisterExtension(unsafe.Pointer(&C.sconcur_module_entry))
 }
 
+
 //export ping
 func ping(s *C.zend_string) unsafe.Pointer {
 	str := frankenphp.GoString(unsafe.Pointer(s))
@@ -22,3 +23,4 @@ func ping(s *C.zend_string) unsafe.Pointer {
 
 	return frankenphp.PHPString(result, false)
 }
+

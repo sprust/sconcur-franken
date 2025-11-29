@@ -9,6 +9,14 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
+    build-essential \
+    pkg-config \
+    libxml2-dev \
+    libsqlite3-dev \
+    php-dev \
+    php-cli \
+    php-pear \
+    make \
     wget && \
     rm -rf /var/lib/apt/lists/*
 
@@ -17,28 +25,31 @@ RUN wget https://github.com/php/frankenphp/releases/download/v1.10.1/frankenphp-
     chmod +x frankenphp-linux-x86_64 && \
     mv frankenphp-linux-x86_64 /usr/local/bin/frankenphp
 
-# Replace php -> frankenphp php-cli
-RUN echo '#!/bin/sh' > /usr/local/bin/php && \
-    echo 'exec /usr/local/bin/frankenphp php-cli "$@"' >> /usr/local/bin/php && \
-    chmod +x /usr/local/bin/php
-
 # Composer
 RUN curl -fsSL https://getcomposer.org/download/latest-stable/composer.phar -o /usr/local/bin/composer && \
     chmod +x /usr/local/bin/composer
 
-# Php source
+# PHP source
 RUN rm -rf /usr/local/sconcur
 RUN mkdir -p -m 777 /usr/local/sconcur
 WORKDIR /usr/local/sconcur
 
-# php
 RUN rm -rf php-src && \
   mkdir -p php-src && \
   wget -P /tmp https://www.php.net/distributions/php-8.4.15.tar.gz && \
   tar -xf /tmp/php-8.4.15.tar.gz -C php-src --strip-components=1 && \
   rm /tmp/php-8.4.15.tar.gz && \
-  chmod -R 777 php-src
+  chmod -R 777 php-src && \
+  cd php-src && \
+  ./configure \
+    --enable-embed \
+    --enable-zts \
+    --disable-zend-signals \
+    --enable-zend-max-execution-timers && \
+  make -j"$(getconf _NPROCESSORS_ONLN)" && \
+  make install
 
+WORKDIR /app
 
 # Check if user and group doesn't exist before creating
 RUN getent group "$GROUP_ID" || addgroup --gid "$GROUP_ID" user

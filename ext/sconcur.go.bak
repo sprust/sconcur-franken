@@ -8,8 +8,9 @@ package sconcur
 import "C"
 
 import (
-	"sconcur/internal/services/ping_service"
 	"unsafe"
+
+	"github.com/sprust/sconcur-franken/internal/services/ping_service"
 
 	"github.com/dunglas/frankenphp"
 )
