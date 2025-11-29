@@ -17,6 +17,11 @@ RUN wget https://github.com/php/frankenphp/releases/download/v1.10.1/frankenphp-
     chmod +x frankenphp-linux-x86_64 && \
     mv frankenphp-linux-x86_64 /usr/local/bin/frankenphp
 
+# Replace php -> frankenphp php-cli
+RUN echo '#!/bin/sh' > /usr/local/bin/php && \
+    echo 'exec /usr/local/bin/frankenphp php-cli "$@"' >> /usr/local/bin/php && \
+    chmod +x /usr/local/bin/php
+
 # Composer
 RUN curl -fsSL https://getcomposer.org/download/latest-stable/composer.phar -o /usr/local/bin/composer && \
     chmod +x /usr/local/bin/composer
