@@ -1,8 +1,8 @@
 services:
-  php:
-    container_name: sc-php
+  golang:
+    container_name: sc-golang
     build:
-      context: ./docker/php
+      context: docker/golang
       args:
         - GROUP_ID=${DOCKER_GROUP_ID}
         - USER_ID=${DOCKER_USER_ID}
