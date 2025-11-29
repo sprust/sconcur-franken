@@ -11,6 +11,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
+    build-essential \
+    php-dev \
+    pkg-config \
     wget && \
     rm -rf /var/lib/apt/lists/*
 
@@ -33,6 +36,9 @@ RUN chmod -R 777 /go/
 RUN wget https://github.com/caddyserver/xcaddy/releases/download/v0.4.5/xcaddy_0.4.5_linux_amd64.deb && \
     dpkg -i xcaddy_0.4.5_linux_amd64.deb && \
     rm xcaddy_0.4.5_linux_amd64.deb
+
+RUN apt-get install -y build-essential php-dev pkg-config
+
 
 # Check if user and group doesn't exist before creating
 RUN getent group "$GROUP_ID" || addgroup --gid "$GROUP_ID" user
