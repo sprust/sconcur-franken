@@ -5,7 +5,10 @@ up:
 	docker-compose up -d
 
 stop:
-	docker-compose stop
+	docker-compose stop --timeout 1
+
+down:
+	docker-compose down --timeout 1
 
 bash:
 	@"$(GOLANG_CLI)"bash
