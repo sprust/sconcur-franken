@@ -39,30 +39,19 @@ RUN mkdir -p -m 777 /go/pkg/mod/cache/download
 RUN chown $USER_ID:$GROUP_ID /go/pkg/mod/cache/download
 RUN chmod -R 777 /go/
 
+# Download and install FrankenPHP
+RUN wget https://github.com/php/frankenphp/releases/download/v1.10.1/frankenphp-linux-x86_64 && \
+    chmod +x frankenphp-linux-x86_64 && \
+    mv frankenphp-linux-x86_64 /usr/local/bin/frankenphp
+
 # Download and install xcaddy
 RUN wget https://github.com/caddyserver/xcaddy/releases/download/v0.4.5/xcaddy_0.4.5_linux_amd64.deb && \
     dpkg -i xcaddy_0.4.5_linux_amd64.deb && \
     rm xcaddy_0.4.5_linux_amd64.deb
 
-# PHP source
 RUN rm -rf /usr/local/sconcur
 RUN mkdir -p -m 777 /usr/local/sconcur
 WORKDIR /usr/local/sconcur
-
-RUN rm -rf php-src && \
-  mkdir -p php-src && \
-  wget -P /tmp https://www.php.net/distributions/php-8.4.15.tar.gz && \
-  tar -xf /tmp/php-8.4.15.tar.gz -C php-src --strip-components=1 && \
-  rm /tmp/php-8.4.15.tar.gz && \
-  chmod -R 777 php-src && \
-  cd php-src && \
-  ./configure \
-    --enable-embed \
-    --enable-zts \
-    --disable-zend-signals \
-    --enable-zend-max-execution-timers && \
-  make -j"$(getconf _NPROCESSORS_ONLN)" && \
-  make install
 
 # watcher
 RUN rm -rf watcher && \
@@ -73,6 +62,22 @@ RUN rm -rf watcher && \
   cmake --install build && \
   echo "/usr/local/lib" | tee /etc/ld.so.conf.d/watcher.conf && \
   ldconfig
+
+# php
+RUN rm -rf php-src && \
+  mkdir -p php-src && \
+  wget -P /tmp https://www.php.net/distributions/php-8.4.15.tar.gz && \
+  tar -xf /tmp/php-8.4.15.tar.gz -C php-src --strip-components=1 && \
+  rm /tmp/php-8.4.15.tar.gz && \
+  chmod -R 777 php-src && \
+  cd php-src && \
+  ./configure \
+    --enable-embed=static \
+    --enable-zts \
+    --disable-zend-signals \
+    --enable-zend-max-execution-timers && \
+  make -j"$(getconf _NPROCESSORS_ONLN)" && \
+  make install
 
 WORKDIR /app
 
