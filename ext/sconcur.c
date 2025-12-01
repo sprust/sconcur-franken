@@ -1,40 +1,55 @@
-#include <php.h>
-#include <Zend/zend_API.h>
-#include <Zend/zend_hash.h>
-#include <Zend/zend_types.h>
-#include <stddef.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#include "sconcur.h"
-#include "sconcur_arginfo.h"
+#include <php.h>
+#include <stdlib.h>
 #include "_cgo_export.h"
 
+// Описание аргументов: 1 обязательный аргумент типа string
+ZEND_BEGIN_ARG_INFO_EX(arginfo_ping, 0, 0, 1)
+    ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
+ZEND_END_ARG_INFO()
 
-PHP_MINIT_FUNCTION(sconcur) {
-    
-    return SUCCESS;
-}
+// Реализация функции
+PHP_FUNCTION(ping) {
+    char *name = NULL;
+    size_t name_len;
 
-zend_module_entry sconcur_module_entry = {STANDARD_MODULE_HEADER,
-                                         "sconcur",
-                                         ext_functions,             /* Functions */
-                                         PHP_MINIT(sconcur),  /* MINIT */
-                                         NULL,                      /* MSHUTDOWN */
-                                         NULL,                      /* RINIT */
-                                         NULL,                      /* RSHUTDOWN */
-                                         NULL,                      /* MINFO */
-                                         "1.0.0",                   /* Version */
-                                         STANDARD_MODULE_PROPERTIES};
-PHP_FUNCTION(SConcur_Extension_ping)
-{
-    zend_string *string = NULL;
-    ZEND_PARSE_PARAMETERS_START(1, 1)
-        Z_PARAM_STR(string)
-    ZEND_PARSE_PARAMETERS_END();
-    zend_string *result = ping(string);
-    if (result) {
-        RETURN_STR(result);
+    // "s" означает строку. PHP сам заполнит указатель name и длину name_len
+    if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &name, &name_len) == FAILURE) {
+        RETURN_THROWS();
     }
 
-	RETURN_EMPTY_STRING();
+    // Вызов Go
+    char *response = ping(name);
+
+    // Возврат значения в PHP (копирование)
+    RETVAL_STRING(response);
+
+    // Очистка памяти Go
+    free(response);
 }
 
+// Регистрация функции с неймспейсом SConcur\Extension
+static const zend_function_entry sconcur_functions[] = {
+    ZEND_NS_FE("SConcur\\Extension", ping, arginfo_ping)
+    PHP_FE_END
+};
+
+// Модуль
+zend_module_entry sconcur_module_entry = {
+    STANDARD_MODULE_HEADER,
+    "sconcur",
+    sconcur_functions,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    "0.1",
+    STANDARD_MODULE_PROPERTIES
+};
+
+// Точка входа (без ifdef, чтобы работало при go build)
+ZEND_GET_MODULE(sconcur)
