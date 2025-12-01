@@ -1,8 +1,8 @@
 services:
-  php:
-    container_name: sc-php
+  franken:
+    container_name: sc-franken
     build:
-      context: ./docker/php
+      context: ./docker/franken
       args:
         - GROUP_ID=${DOCKER_GROUP_ID}
         - USER_ID=${DOCKER_USER_ID}

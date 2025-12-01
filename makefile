@@ -1,5 +1,5 @@
-PHP_SERVICE=php
-PHP_CLI="docker-compose exec -it $(PHP_SERVICE) "
+FRANKEN_SERVICE=franken
+FRANKEN_CLI="docker-compose exec -it $(FRANKEN_SERVICE) "
 
 up:
 	docker-compose up -d
@@ -11,10 +11,7 @@ down:
 	docker-compose down --timeout 1
 
 bash:
-	@"$(PHP_CLI)"bash
+	@"$(FRANKEN_CLI)"bash
 
 composer:
-	@"$(PHP_CLI)"ext/build/frankenphp php-cli /usr/local/bin/composer ${c}
-
-php:
-	@"$(PHP_CLI)"ext/build/frankenphp php-cli ${c}
+	@"$(FRANKEN_CLI)"frankenphp php-cli /usr/local/bin/composer ${c}
