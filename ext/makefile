@@ -19,9 +19,6 @@ go:
 test:
 	@"$(GOLANG_CLI)"go test ./internal/...
 
-ext-init:
-	GEN_STUB_SCRIPT=/usr/local/lib/php/build/gen_stub.php frankenphp extension-init sconcur.go
-
 ext-build:
 	 rm -f build/sconcur.so build/sconcur.h && CGO_CFLAGS=$(php-config --includes) go build -buildmode=c-shared -o build/sconcur.so .
 

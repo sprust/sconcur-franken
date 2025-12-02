@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM php:8.4.15-cli
 
 WORKDIR /app
 
@@ -9,19 +9,8 @@ ARG GROUP_ID
 # Install required packages
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    build-essential \
-    pkg-config \
-    libxml2-dev \
-    libsqlite3-dev \
-    php-dev \
-    php-cli \
-    php-pear \
-    make \
-    cmake \
-    git \
-    wget && \
+      ca-certificates \
+      wget && \
     rm -rf /var/lib/apt/lists/*
 
 ENV GO_VERSION="1.25.0"
@@ -38,48 +27,6 @@ RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH" && mkdir -p /
 RUN mkdir -p -m 777 /go/pkg/mod/cache/download
 RUN chown $USER_ID:$GROUP_ID /go/pkg/mod/cache/download
 RUN chmod -R 777 /go/
-
-# Download and install FrankenPHP
-RUN wget https://github.com/php/frankenphp/releases/download/v1.10.1/frankenphp-linux-x86_64 && \
-    chmod +x frankenphp-linux-x86_64 && \
-    mv frankenphp-linux-x86_64 /usr/local/bin/frankenphp
-
-# Download and install xcaddy
-RUN wget https://github.com/caddyserver/xcaddy/releases/download/v0.4.5/xcaddy_0.4.5_linux_amd64.deb && \
-    dpkg -i xcaddy_0.4.5_linux_amd64.deb && \
-    rm xcaddy_0.4.5_linux_amd64.deb
-
-RUN rm -rf /usr/local/sconcur
-RUN mkdir -p -m 777 /usr/local/sconcur
-WORKDIR /usr/local/sconcur
-
-# watcher
-RUN rm -rf watcher && \
-  git clone https://github.com/e-dant/watcher.git && \
-  cd watcher && \
-  cmake -B build && \
-  cmake --build build && \
-  cmake --install build && \
-  echo "/usr/local/lib" | tee /etc/ld.so.conf.d/watcher.conf && \
-  ldconfig
-
-# php
-RUN rm -rf php-src && \
-  mkdir -p php-src && \
-  wget -P /tmp https://www.php.net/distributions/php-8.4.15.tar.gz && \
-  tar -xf /tmp/php-8.4.15.tar.gz -C php-src --strip-components=1 && \
-  rm /tmp/php-8.4.15.tar.gz && \
-  chmod -R 777 php-src && \
-  cd php-src && \
-  ./configure \
-    --enable-embed=static \
-    --enable-zts \
-    --disable-zend-signals \
-    --enable-zend-max-execution-timers && \
-  make -j"$(getconf _NPROCESSORS_ONLN)" && \
-  make install
-
-WORKDIR /app
 
 # Check if user and group doesn't exist before creating
 RUN getent group "$GROUP_ID" || addgroup --gid "$GROUP_ID" user
