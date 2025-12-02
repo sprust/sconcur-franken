@@ -1,9 +1,9 @@
-package ping_service
+package usleep_feature
 
 import (
 	"fmt"
 )
 
-func Ping(string string) string {
+func Sleep(string string) string {
 	return fmt.Sprintf("pong %s", string)
 }

@@ -1,4 +1,4 @@
-package ping_service
+package ping_feature
 
 import (
 	"testing"
